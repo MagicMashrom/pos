@@ -1,26 +1,39 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Stock extends CI_Controller {
+class Stock extends CI_Controller
+{
 
-	function __construct()
+    function __construct()
     {
         parent::__construct();
         check_not_login();
         $this->load->model(['item_m', 'supplier_m', 'stock_m']);
     }
 
-    public function stock_in_data() 
+    public function stock_in_data()
     {
         $data['row'] = $this->stock_m->get_stock_in()->result();
         $this->template->load('template', 'transaction/stock_in/stock_in_data', $data);
     }
 
-    public function stock_in_add() 
+    public function stock_in_add()
     {
-        $item = $this->item_m->get()->result();
         $supplier = $this->supplier_m->get()->result();
-        $data = ['item' => $item, 'supplier' => $supplier];
+        $data['supplier'] = $supplier;
+
+        if (!empty($_POST)) {
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $data['item'] = $item;
+        } else {
+            $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
+
+            $_POST['barcode'] = null;
+        }
+
+        $inputan['inputan'] = $_POST;
+
+        $data = array_merge($data, $inputan);
         $this->template->load('template', 'transaction/stock_in/stock_in_form', $data);
     }
 
@@ -32,7 +45,7 @@ class Stock extends CI_Controller {
         $data = ['qty' => $qty, 'item_id' => $item_id];
         $this->item_m->update_stock_out($data);
         $this->stock_m->del($stock_id);
-        if($this->db->affected_rows() > 0) {
+        if ($this->db->affected_rows() > 0) {
             $this->session->set_flashdata('success', 'Data Stock-In berhasil dihapus');
         }
         redirect('stock/in');
@@ -46,9 +59,21 @@ class Stock extends CI_Controller {
 
     public function stock_out_add()
     {
-        $item = $this->item_m->get()->result();
         $supplier = $this->supplier_m->get()->result();
-        $data = ['item' => $item, 'supplier' => $supplier];
+        $data['supplier'] = $supplier;
+
+        if (!empty($_POST)) {
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $data['item'] = $item;
+        } else {
+            $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
+
+            $_POST['barcode'] = null;
+        }
+
+        $inputan['inputan'] = $_POST;
+
+        $data = array_merge($data, $inputan);
         $this->template->load('template', 'transaction/stock_out/stock_out_form', $data);
     }
 
@@ -60,13 +85,13 @@ class Stock extends CI_Controller {
         $data = ['qty' => $qty, 'item_id' => $item_id];
         $this->item_m->update_stock_in($data);
         $this->stock_m->del($stock_id);
-        if($this->db->affected_rows() > 0) {
+        if ($this->db->affected_rows() > 0) {
             $this->session->set_flashdata('success', 'Data Stock-Out berhasil dihapus');
         }
         redirect('stock/out');
     }
 
-    public function stock_return_data() 
+    public function stock_return_data()
     {
         $data['row'] = $this->stock_m->get_stock_return()->result();
         $this->template->load('template', 'transaction/return/return_data', $data);
@@ -74,9 +99,21 @@ class Stock extends CI_Controller {
 
     public function stock_return_add()
     {
-        $item = $this->item_m->get()->result();
         $supplier = $this->supplier_m->get()->result();
-        $data = ['item' => $item, 'supplier' => $supplier];
+        $data['supplier'] = $supplier;
+
+        if (!empty($_POST)) {
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $data['item'] = $item;
+        } else {
+            $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
+
+            $_POST['barcode'] = null;
+        }
+
+        $inputan['inputan'] = $_POST;
+
+        $data = array_merge($data, $inputan);
         $this->template->load('template', 'transaction/return/return_form', $data);
     }
 
@@ -88,19 +125,19 @@ class Stock extends CI_Controller {
         $data = ['qty' => $qty, 'item_id' => $item_id];
         $this->item_m->update_stock_in($data);
         $this->stock_m->del($stock_id);
-        if($this->db->affected_rows() > 0) {
+        if ($this->db->affected_rows() > 0) {
             $this->session->set_flashdata('success', 'Data Stock-Return berhasil dihapus');
         }
         redirect('stock/return');
     }
 
-    public function process() 
+    public function process()
     {
-        if(isset($_POST['in_add'])) {
+        if (isset($_POST['in_add'])) {
             $post = $this->input->post(null, TRUE);
             $this->stock_m->add_stock_in($post);
             $this->item_m->update_stock_in($post);
-            if($this->db->affected_rows() > 0) {
+            if ($this->db->affected_rows() > 0) {
                 $this->session->set_flashdata('success', 'Data Stock-In berhasil disimpan');
             }
             redirect('stock/in');
@@ -108,19 +145,18 @@ class Stock extends CI_Controller {
             $post = $this->input->post(null, TRUE);
             $this->stock_m->add_stock_out($post);
             $this->item_m->update_stock_out($post);
-            if($this->db->affected_rows() > 0) {
+            if ($this->db->affected_rows() > 0) {
                 $this->session->set_flashdata('success', 'Data Stock-Out berhasil disimpan');
             }
             redirect('stock/out');
-        } else if (isset($_POST['return_add'])){
+        } else if (isset($_POST['return_add'])) {
             $post = $this->input->post(null, TRUE);
             $this->stock_m->add_stock_return($post);
             $this->item_m->update_stock_out($post);
-            if($this->db->affected_rows() > 0) {
+            if ($this->db->affected_rows() > 0) {
                 $this->session->set_flashdata('success', 'Data Stock-Return berhasil disimpan');
             }
             redirect('stock/return');
         }
     }
-
 }

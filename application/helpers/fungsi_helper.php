@@ -52,3 +52,14 @@ function GetKodePenjualan(){
 
     return "KDP" . $AmbilTanggalSekarang . $KodePenjualanBaru;
 }
+
+function pre($value)
+{
+	return var_dump('<pre>', $value, '</pre>');
+}
+
+
+function pr($value)
+{
+	return "<pre>" . print_r($value) . "</pre>";
+}

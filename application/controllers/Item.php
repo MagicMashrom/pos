@@ -1,8 +1,9 @@
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php defined('BASEPATH') or exit('No direct script access allowed');
 
-class Item extends CI_Controller {
+class Item extends CI_Controller
+{
 
-	function __construct()
+    function __construct()
     {
         parent::__construct();
         check_not_login();
@@ -40,41 +41,41 @@ class Item extends CI_Controller {
     //     echo json_encode($output);
     // }
 
-	public function index()
-	{
-		$data['row'] = $this->item_m->get();
-		$this->template->load('template', 'product/item/item_data', $data);
-	}
-
-	public function add()
+    public function index()
     {
-		$item = new stdClass();
-		$item->item_id = null;
+        $data['row'] = $this->item_m->get();
+        $this->template->load('template', 'product/item/item_data', $data);
+    }
+
+    public function add()
+    {
+        $item = new stdClass();
+        $item->item_id = null;
         $item->barcode = null;
-		$item->name = null;
+        $item->name = null;
         $item->price = null;
         $query_unit = $this->unit_m->get();
         $unit[null] = '- Pilih -';
-        foreach($query_unit->result() as $unt) {
+        foreach ($query_unit->result() as $unt) {
             $unit[$unt->unit_id] = $unt->name;
         }
 
-		$data = array(
-			'page' => 'add',
-			'row' => $item,
+        $data = array(
+            'page' => 'add',
+            'row' => $item,
             'unit' => $unit, 'selectedunit' => null,
-		);
-		$this->template->load('template', 'product/item/item_form', $data);
-	}
+        );
+        $this->template->load('template', 'product/item/item_form', $data);
+    }
 
-	public function edit($id)
+    public function edit($id)
     {
-		$query = $this->item_m->get($id);
-		if($query->num_rows() > 0) {
-			$item = $query->row();
-	        $query_unit = $this->unit_m->get();
+        $query = $this->item_m->get($id);
+        if ($query->num_rows() > 0) {
+            $item = $query->row();
+            $query_unit = $this->unit_m->get();
             $unit[null] = '- Pilih -';
-            foreach($query_unit->result() as $unt) {
+            foreach ($query_unit->result() as $unt) {
                 $unit[$unt->unit_id] = $unt->name;
             }
 
@@ -84,103 +85,107 @@ class Item extends CI_Controller {
                 'unit' => $unit, 'selectedunit' => $item->unit_id,
             );
             $this->template->load('template', 'product/item/item_form', $data);
-		} else {
-			echo "<script>alert('Data tidak ditemukan');";
-			echo"window.location='".site_url('item')."';</script>";
-		}
-	}
+        } else {
+            echo "<script>alert('Data tidak ditemukan');";
+            echo "window.location='" . site_url('item') . "';</script>";
+        }
+    }
 
-	public function process()
+    public function process()
     {
-        $config['upload_path'] = './uploads/product/';
-        $config['allowed_types'] = 'gif|jpg|png|jpeg';
-        $config['max_size'] = 2048;
-        $config['file_name'] = 'item-'.date('ymd').'-'.substr(md5(rand(),0,10));
-        $this->load->library('upload', $config);
+        if (!empty($_FILES['image']['name'])) {
+            $config['upload_path'] = './uploads/product/';
+            $config['allowed_types'] = 'gif|jpg|png|jpeg';
+            $config['max_size'] = 2048;
+            $config['file_name'] = 'item-' . date('ymd') . '-' . substr(md5(rand(), 0, 10));
+            $this->load->library('upload', $config);
+        }
 
-		$post = $this->input->post(null, TRUE);
-		if(isset($_POST['add'])) {
-            if($this->item_m->check_barcode($post['barcode'])->num_rows() > 0) {
+        $post = $this->input->post(null, TRUE);
+        if (isset($_POST['add'])) {
+            if ($this->item_m->check_barcode($post['barcode'])->num_rows() > 0) {
                 $this->session->set_flashdata('error', "Barcode $post[barcode] sudah dipakai barang lain");
                 redirect('item/add');
             } else {
-                if(@$_FILES['image']['name'] != null){
-                    if($this->upload->do_upload('image')) {
-                        $post['image'] = $this->upload->data('file_name'); 
+                if (@$_FILES['image']['name'] != null) {
+                    if ($this->upload->do_upload('image')) {
+                        $post['image'] = $this->upload->data('file_name');
                         $this->item_m->add($post);
-                        if($this->db->affected_rows() > 0) {
+                        if ($this->db->affected_rows() > 0) {
                             $this->session->set_flashdata('success', 'Data berhasil disimpan');
                         }
                         redirect('item');
                     } else {
                         $error = $this->upload->display_errors();
                         $this->session->set_flashdata('error', $error);
-                         redirect('item/add');
+                        redirect('item/add');
                     }
                 } else {
-                    $post['image'] = null; 
+                    $post['image'] = null;
                     $this->item_m->add($post);
-                    if($this->db->affected_rows() > 0) {
+                    if ($this->db->affected_rows() > 0) {
                         $this->session->set_flashdata('success', 'Data berhasil disimpan');
-                }
-                redirect('item');
+                    }
+                    die();
+                    // redirect('item');
                 }
             }
-		} else if(isset($_POST['edit'])) {
-            if($this->item_m->check_barcode($post['barcode'], $post['id'])->num_rows() > 0) {
+        } else if (isset($_POST['edit'])) {
+            if ($this->item_m->check_barcode($post['barcode'], $post['id'])->num_rows() > 0) {
                 $this->session->set_flashdata('error', "Barcode $post[barcode] sudah dipakai barang lain");
-                redirect('item/edit'.$post['id']);
+                redirect('item/edit' . $post['id']);
             } else {
-                if(@$_FILES['image']['name'] != null){
-                    if($this->upload->do_upload('image')) {
+                if (@$_FILES['image']['name'] != null) {
+                    if ($this->upload->do_upload('image')) {
 
                         $item = $this->item_m->get($post['id'])->row();
-                        if($item->image != null) {
-                            $target_file = './uploads/product/'.$item->image;
+                        if ($item->image != null) {
+                            $target_file = './uploads/product/' . $item->image;
                             unlink($target_file);
                         }
 
-                        $post['image'] = $this->upload->data('file_name'); 
+                        $post['image'] = $this->upload->data('file_name');
                         $this->item_m->edit($post);
-                        if($this->db->affected_rows() > 0) {
+                        if ($this->db->affected_rows() > 0) {
                             $this->session->set_flashdata('success', 'Data berhasil disimpan');
                         }
                         redirect('item');
                     } else {
                         $error = $this->upload->display_errors();
                         $this->session->set_flashdata('error', $error);
-                         redirect('item/add');
+                        redirect('item/add');
                     }
                 } else {
-                    $post['image'] = null; 
+                    $post['image'] = null;
                     $this->item_m->edit($post);
-                    if($this->db->affected_rows() > 0) {
+                    if ($this->db->affected_rows() > 0) {
                         $this->session->set_flashdata('success', 'Data berhasil disimpan');
-                }
-                redirect('item');
+                    }
+                    redirect('item');
                 }
             }
-		}
+        }
     }
-	
-	public function del($id)
-	{
+
+    public function del($id)
+    {
         $item = $this->item_m->get($id)->row();
-        if($item->image != null) {
-            $target_file = './uploads/product/'.$item->image;
+        if ($item->image != null) {
+            $target_file = './uploads/product/' . $item->image;
             unlink($target_file);
         }
 
-		$this->item_m->del($id);
-		if($this->db->affected_rows() > 0){
-			$this->session->set_flashdata('success', 'Data berhasil dihapus');
-		}
-		redirect('item');
-	}
+        $this->item_m->del($id);
+        if ($this->db->affected_rows() > 0) {
+            $this->session->set_flashdata('success', 'Data berhasil dihapus');
+        }
+        redirect('item');
+    }
 
-    function barcode_qrcode($id) {
+    function barcode_qrcode($id)
+    {
         $data['row'] = $this->item_m->get($id)->row();
-		$this->template->load('template', 'product/item/barcode_qrcode', $data);
+        $this->template->load('template', 'product/item/barcode_qrcode', $data);
     }
 
     // function code_qrcode() {
@@ -189,11 +194,10 @@ class Item extends CI_Controller {
     //     header('Content-Type: '.$qrCode->getContentType());
     //     echo $qrCode->writeString();
     // }
-    function barcode_print($id) {
+    function barcode_print($id)
+    {
         $data['row'] = $this->item_m->get($id)->row();
         $html = $this->load->view('product/item/barcode_print', $data, true);
-        $this->fungsi->PdfGenerator($html, 'barcode-'.$data['row']->barcode, 'A4', 'landscape');
+        $this->fungsi->PdfGenerator($html, 'barcode-' . $data['row']->barcode, 'A4', 'landscape');
     }
-
-    
 }

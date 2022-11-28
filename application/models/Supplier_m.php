@@ -6,6 +6,7 @@ class Supplier_m extends CI_Model {
     public function get($id = null)
     {
         $this->db->from('supplier');
+        $this->db->group_by('name_perusahaan');
         if($id != null) {
             $this->db->where('supplier_id', $id);
         }
