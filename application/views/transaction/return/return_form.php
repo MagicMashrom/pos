@@ -12,6 +12,7 @@
 
  <!-- Main content -->
  <section class="content">
+<?php $this->view('messages')?>
      <div class="box">
          <div class="box-header ">
              <h3 class="box-title"> Add Return</h3>

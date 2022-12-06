@@ -23,7 +23,30 @@ class Stock extends CI_Controller
         $data['supplier'] = $supplier;
 
         if (!empty($_POST)) {
-            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result();
+
+            if (empty($item[0])) {
+                $item = (object)[
+                    "item_id" => null,
+                    "barcode" => null,
+                    "name" => null,
+                    "category_id" => null,
+                    "unit_id" => null,
+                    "price" => null,
+                    "stock" => null,
+                    "image" => null,
+                    "created" => null,
+                    "updated" => null,
+                    "unit_name" => null
+                ];
+
+                $this->session->set_flashdata('error', 'Kode Barang Tidak Ditemukan!');
+            } else {
+                $item = $item[0];
+
+                unset($_SESSION['error']);
+            }
+
             $data['item'] = $item;
         } else {
             $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
@@ -63,7 +86,30 @@ class Stock extends CI_Controller
         $data['supplier'] = $supplier;
 
         if (!empty($_POST)) {
-            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result();
+
+            if (empty($item[0])) {
+                $item = (object)[
+                    "item_id" => null,
+                    "barcode" => null,
+                    "name" => null,
+                    "category_id" => null,
+                    "unit_id" => null,
+                    "price" => null,
+                    "stock" => null,
+                    "image" => null,
+                    "created" => null,
+                    "updated" => null,
+                    "unit_name" => null
+                ];
+
+                $this->session->set_flashdata('error', 'Kode Barang Tidak Ditemukan!');
+            } else {
+                $item = $item[0];
+
+                unset($_SESSION['error']);
+            }
+
             $data['item'] = $item;
         } else {
             $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
@@ -103,7 +149,29 @@ class Stock extends CI_Controller
         $data['supplier'] = $supplier;
 
         if (!empty($_POST)) {
-            $item = $this->item_m->get(null, $this->input->post('barcode'))->result()[0];
+            $item = $this->item_m->get(null, $this->input->post('barcode'))->result();
+
+            if (empty($item[0])) {
+                $item = (object)[
+                    "item_id" => null,
+                    "barcode" => null,
+                    "name" => null,
+                    "category_id" => null,
+                    "unit_id" => null,
+                    "price" => null,
+                    "stock" => null,
+                    "image" => null,
+                    "created" => null,
+                    "updated" => null,
+                    "unit_name" => null
+                ];
+
+                $this->session->set_flashdata('error', 'Kode Barang Tidak Ditemukan!');
+            } else {
+                $item = $item[0];
+
+                unset($_SESSION['error']);
+            }
             $data['item'] = $item;
         } else {
             $data['item'] = (object)['item_id' => null, 'name' => null, 'unit_name' => null, 'stock' => null];
