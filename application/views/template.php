@@ -278,7 +278,7 @@
         var scanbarcode = $(this).val();
         var arahpost = $(".arahpost").val();
 
-        if (panjanginput == 4) {
+        if (panjanginput >= 4) {
           var form = $(".formsb");
           form.prop("action", siteku + arahpost);
           form.submit();
