@@ -1,12 +1,13 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class Stock_m extends CI_Model {
+class Stock_m extends CI_Model
+{
 
     public function get($id = null)
     {
         $this->db->from('t_stock');
-        if($id != null) {
+        if ($id != null) {
             $this->db->where('stock_id', $id);
         }
         $query = $this->db->get();
@@ -30,6 +31,23 @@ class Stock_m extends CI_Model {
         $this->db->order_by('stock_id', 'desc');
         $query = $this->db->get();
         return $query;
+    }
+
+    public function check_stock_in($kodebarang)
+    {
+        $this->db->select('s.stock_id, s.qty');
+        $this->db->from('p_item i');
+        $this->db->join('t_stock s', 'i.item_id = s.item_id');
+        $this->db->where("i.barcode", $kodebarang);
+        $this->db->where("type", 'in');
+        $query = $this->db->get();
+        return $query;
+    }
+
+    public function upd_stock_in($stockid, $qty)
+    {
+        $this->db->where("stock_id", $stockid);
+        $this->db->update('t_stock s', ['qty' => $qty]);
     }
 
     public function get_stock_out()

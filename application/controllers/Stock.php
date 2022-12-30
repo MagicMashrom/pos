@@ -203,11 +203,21 @@ class Stock extends CI_Controller
     {
         if (isset($_POST['in_add'])) {
             $post = $this->input->post(null, TRUE);
-            $this->stock_m->add_stock_in($post);
-            $this->item_m->update_stock_in($post);
+            $check_stock_in = $this->stock_m->check_stock_in($post['barcode'])->result();
+
+            if (!empty($check_stock_in)) {
+                $qty = $_POST['qty'] + $check_stock_in[0]->qty;
+                $this->stock_m->upd_stock_in($check_stock_in[0]->stock_id, $qty);
+            }
+            else {
+                $this->stock_m->add_stock_in($post);
+                $this->item_m->update_stock_in($post);
+            }
+            
             if ($this->db->affected_rows() > 0) {
                 $this->session->set_flashdata('success', 'Data Stock-In berhasil disimpan');
             }
+            
             redirect('stock/in');
         } else if (isset($_POST['out_add'])) {
             $post = $this->input->post(null, TRUE);

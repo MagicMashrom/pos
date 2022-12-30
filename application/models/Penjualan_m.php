@@ -61,5 +61,17 @@ class Penjualan_m extends CI_Model {
         ];
         $this->db->insert('detail_penjualan', $data);
 
+        $query = "
+            UPDATE t_penjualan p
+            INNER JOIN p_item i ON p.kode_barang = i.barcode
+            INNER JOIN t_stock s ON i.item_id = s.item_id 
+            SET 
+                s.qty = ( s.qty - p.jumlah ),
+                i.stock = ( i.stock - p.jumlah ) 
+            WHERE
+                p.kode_penjualan = '$data[kode_penjualan]' 
+                AND type = 'out'
+        ";
+        $this->db->query($query);
     }
 }
